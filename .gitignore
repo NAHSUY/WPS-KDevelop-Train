@@ -1,0 +1,33 @@
+# 编译输出
+Debug/
+Release/
+build/
+build_ninja/
+bin/
+obj/
+*.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+
+# CMake 缓存
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+_deps/
+thirdparty_install/
+coverage_report/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+
+# 系统
+Thumbs.db
+.DS_Store
