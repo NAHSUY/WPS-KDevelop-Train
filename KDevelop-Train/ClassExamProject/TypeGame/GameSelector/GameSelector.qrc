@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/imagePng">
+        <file>PNG/SPACE_MAINMENU_BG.png</file>
+        <file>PNG/APPLE_BACKGROUND.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(malloc_free_benchmark LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(BENCHMARK_INSTALL_DIR "D:/C++_project/KDevelop-Train/LessonCode/week02/practice/benchmark/build")
+find_package(benchmark CONFIG REQUIRED PATHS ${BENCHMARK_INSTALL_DIR})
+
+add_executable(heap_vs_malloc_benchmark heap_vs_malloc_benchmark.cpp)
+target_link_libraries(heap_vs_malloc_benchmark PRIVATE benchmark::benchmark_main)

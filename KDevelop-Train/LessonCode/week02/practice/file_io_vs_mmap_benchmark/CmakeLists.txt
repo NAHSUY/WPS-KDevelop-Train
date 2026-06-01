@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(file_io_vs_mmap_benchmark LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(BENCHMARK_INSTALL_DIR "D:/C++_project/KDevelop-Train/LessonCode/week02/practice/benchmark/build")
+find_package(benchmark CONFIG REQUIRED PATHS ${BENCHMARK_INSTALL_DIR})
+
+add_executable(file_io_vs_mmap_benchmark file_io_vs_mmap_benchmark.cpp)
+target_link_libraries(file_io_vs_mmap_benchmark PRIVATE benchmark::benchmark_main)
