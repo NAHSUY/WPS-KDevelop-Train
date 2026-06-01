@@ -18,7 +18,6 @@ CMakeFiles/
 cmake_install.cmake
 compile_commands.json
 _deps/
-thirdparty_install/
 coverage_report/
 
 # IDE

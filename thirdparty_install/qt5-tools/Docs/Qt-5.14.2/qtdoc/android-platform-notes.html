@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+<!-- android-platform-notes.qdoc -->
+  <title>Platform and Compiler Notes - Android | Qt 5.14</title>
+  <link rel="stylesheet" type="text/css" href="style/offline-simple.css" />
+  <script type="text/javascript">
+    document.getElementsByTagName("link").item(0).setAttribute("href", "style/offline.css");
+    // loading style sheet breaks anchors that were jumped to before
+    // so force jumping to anchor again
+    setTimeout(function() {
+        var anchor = location.hash;
+        // need to jump to different anchor first (e.g. none)
+        location.hash = "#";
+        setTimeout(function() {
+            location.hash = anchor;
+        }, 0);
+    }, 0);
+  </script>
+</head>
+<body>
+<div class="header" id="qtdocheader">
+  <div class="main">
+    <div class="main-rounded">
+      <div class="navigationbar">
+        <table><tr>
+<td ><a href="index.html">Qt 5.14</a></td><td >Platform and Compiler Notes - Android</td></tr></table><table class="buildversion"><tr>
+<td id="buildversion" width="100%" align="right">Qt 5.14.2 Reference Documentation</td>
+        </tr></table>
+      </div>
+    </div>
+<div class="content">
+<div class="line">
+<div class="content mainContent">
+<p class="naviNextPrevious headerNavi">
+</p><p/>
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#android-development-in-qt-creator">Android Development in Qt Creator</a></li>
+<li class="level1"><a href="#application-package">Application Package</a></li>
+<li class="level1"><a href="#plugins-and-imports-special-considerations">Plugins and Imports Special Considerations</a></li>
+<li class="level1"><a href="#text-special-considerations">Text Special Considerations</a></li>
+<li class="level1"><a href="#opengl-special-considerations">OpenGL Special Considerations</a></li>
+<li class="level1"><a href="#multimedia-special-considerations">Multimedia Special Considerations</a></li>
+<li class="level1"><a href="#assets-file-system">Assets File System</a></li>
+<li class="level1"><a href="#supported-architectures">Supported Architectures</a></li>
+<li class="level1"><a href="#known-issues">Known Issues</a></li>
+<li class="level1"><a href="#supported-environment-variables">Supported Environment Variables</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<h1 class="title">Platform and Compiler Notes - Android</h1>
+<span class="subtitle"></span>
+<!-- $$$android-platform-notes.html-description -->
+<div class="descr"> <a name="details"></a>
+<p>This page contains information particular to building Qt applications for and running them on the <a href="android.html">Android</a> platform. Qt supports Android versions 4.1 (API level 16) or later.</p>
+<a name="android-development-in-qt-creator"></a>
+<h2 id="android-development-in-qt-creator">Android Development in Qt Creator</h2>
+<p>The easiest way to develop with Qt for Android is to use <a href="https://doc.qt.io/qtcreator/creator-developing-android.html">Qt Creator</a>. When you apply a <b>Qt for Android Kit</b> to a Qt Creator project, it will create and maintain a set of files which are required to make your application run on Android.</p>
+<p>The files added to your project are:</p>
+<ul>
+<li><i>.java</i> files will serve as the entry point into your application and automatically load Qt to execute the native code in your application</li>
+<li><i>AndroidManifest.xml</i> which provides meta-information about your application</li>
+<li>Other XML files detailing the dependencies of your application</li>
+<li>Resource files</li>
+<li>Depending on the deployment method selected in Qt Creator, additional files like libraries and QML files can be included in the project.</li>
+</ul>
+<p>Qt Creator adds these files in a subdirectory of your project called <b>android</b>. The contents of the <b>android</b> folder is used as basis for your app's distributable application package.</p>
+<a name="application-package"></a>
+<h2 id="application-package">Application Package</h2>
+<p>On Android, apps are distributed to devices in packages called <i>APK</i>.</p>
+<p>For distributing apps in Google Play, a different format called AAB is used instead.</p>
+<p>Although Qt Creator supports building both these package formats for you, you could also build them manually when needed. To do so, ensure that the necessary packages and build files are in place. For more detailed information about how the packaging is done, see <a href="deployment-android.html">Deploying an Application on Android</a>.</p>
+<a name="plugins-and-imports-special-considerations"></a>
+<h2 id="plugins-and-imports-special-considerations">Plugins and Imports Special Considerations</h2>
+<p>If an application uses plugins that depend on other modules, these modules must be listed in the application's dependencies. This is because Qt Creator does not know ahead of time which plugins your application will end up loading.</p>
+<p>For example, if a plugin depends on <a href="../qtmultimedia/qtmultimedia-index.html">Qt Multimedia</a>, then the Qt Multimedia module must explicitly be made a dependency of the application, otherwise the plugin cannot be loaded. You can do this by adding it to the application's <code>.pro</code> file:</p>
+<pre class="cpp">
+
+  QT <span class="operator">+</span><span class="operator">=</span> multimedia
+
+</pre>
+<p>The automatic deployment tool detects any dependencies on QML modules that are imported from the application's code, but in special case (for instance when QML code is generated by the C++ code), this is not possible. If this generated code imports any special QML modules, they are not detected by the deployment tool and therefore will not be included in the application bundle.</p>
+<p>In these cases, you must add &quot;dummy&quot; QML code importing the same modules as the generated code, so that the automated tool detects the dependencies.</p>
+<a name="text-special-considerations"></a>
+<h2 id="text-special-considerations">Text Special Considerations</h2>
+<p>Because of a bug in some OpenGL drivers, the mechanism used by Qt to cache text glyphs does not work as expected on all Android devices, causing text to appear scrambled. To remedy this, a workaround is in place, which increases memory consumption and can also affect text rendering performance. Before Qt 5.3&#x2e;2, the workaround was enabled only for a particular set of devices. It is now used by default on all devices.</p>
+<p>You can disable the workaround by setting the <code>QT_ANDROID_DISABLE_GLYPH_CACHE_WORKAROUND</code> environment variable to <code>1</code>. You should do so only after verifying that text appears correctly on all targeted devices.</p>
+<a name="opengl-special-considerations"></a>
+<h2 id="opengl-special-considerations">OpenGL Special Considerations</h2>
+<p>Modern devices often support OpenGL ES 3.0 or 3.1 in addition to 2.0&#x2e; To get a suitable OpenGL context, set the requested version via <a href="../qtgui/qsurfaceformat.html#setVersion">QSurfaceFormat::setVersion</a>(). Note however that the header files are only available in recent API levels, for example to include gl31.h, you need to target API level 21. Keep in mind also that using OpenGL ES 3.x features will result in the application breaking on older devices that only support 2.0&#x2e;</p>
+<a name="multimedia-special-considerations"></a>
+<h2 id="multimedia-special-considerations">Multimedia Special Considerations</h2>
+<p>The <a href="../qtmultimedia/qtmultimediawidgets-index.html">Qt Multimedia Widgets</a> module is not supported on Android, which means video display is only available using the <a href="../qtmultimedia/qml-qtmultimedia-videooutput.html">VideoOutput</a> and the <a href="../qtmultimedia/qml-qtmultimedia-video.html">Video</a> QML Type.</p>
+<a name="assets-file-system"></a>
+<h2 id="assets-file-system">Assets File System</h2>
+<p>Qt for Android provides a special, virtual file system which is based on the <i>assets</i> mechanism in Android. Files that are put under <i>assets</i> in the <i>android</i> folder created by Qt Creator, will be packaged as part of your application package. These can be accessed in Qt by prefixing the paths with <code>assets:/</code>. For instance, to access the image <i>logo.png</i> in the folder <i>assets/images</i>, you can use <code>QPixmap(&quot;assets:/images/logo.png&quot;)</code>.</p>
+<p>If using the assets mechanism is not required for your app, the recommended way of distributing resources with your Qt app is to use <a href="../qtcore/resources.html">The Qt Resource System</a>, which is a cross-platform mechanism for distributing resources with your app.</p>
+<a name="supported-architectures"></a>
+<h2 id="supported-architectures">Supported Architectures</h2>
+<p>Qt for Android currently has binaries for armv7a, arm64-v8a, x86 and x86-64.</p>
+<p>If you want to support several different ABIs in your application, the recommendation is to build an Application App Bundle (AAB) containing binaries for each of the ABIs. Based on this, Google Play generates optimized Application Packages (APK) for the device issuing the download request.</p>
+<p>The Application App Bundle is generated by Qt Creator, if the corresponding checkbox for this is selected in the project settings. It can also be built from the command line by using the &quot;aab&quot; Makefile target.</p>
+<pre class="cpp">
+
+  <span class="operator">%</span> make aab
+
+</pre>
+<a name="known-issues"></a>
+<h2 id="known-issues">Known Issues</h2>
+<p>Due to a bug on some devices, when you turn off predictive text with <code>ImhNoPredictiveText</code>, this property will be ignored and predictive text will still be enabled. To work around this, set the <code>QT_ANDROID_ENABLE_WORKAROUND_TO_DISABLE_PREDICTIVE_TEXT</code> environment variable to <code>1</code>. However, one side effect is that this environment variable can cause a problem with other keyboards such as Gboard. If you use a language like Japanese, with Gboard, only a QWERTY keyboard is displayed. This environment variable is queried each time the keyboard is displayed, so it's possible to toggle the workaround on and off, as necessary.</p>
+<a name="supported-environment-variables"></a>
+<h2 id="supported-environment-variables">Supported Environment Variables</h2>
+<p>The following environment variables are available for building applications with Qt for Android.</p>
+<div class="table"><table class="generic">
+ <thead><tr class="qt-style"><th >Variable</th><th >Description</th></tr></thead>
+<tr valign="top" class="odd"><td >ANDROID_NDK_ROOT</td><td >Specifies where the Android NDK is located.</td></tr>
+<tr valign="top" class="even"><td >ANDROID_SDK_ROOT</td><td >Specifies where the Android SDK is located.</td></tr>
+<tr valign="top" class="odd"><td >ANDROID_NDK_PLATFORM</td><td >Specifies the NDK API version; the default is android-21.</td></tr>
+<tr valign="top" class="even"><td >ANDROID_API_VERSION</td><td >Specifies the Java API version, which can differ from your NDK API version (ANDROID_NDK_PLATFORM). The default is the highest API version found on your system.</td></tr>
+<tr valign="top" class="odd"><td >ANDROID_NDK_HOST</td><td >Specifies the host for which the toolchain was built. For example, <code>linux-x86_64</code> for Linux, <code>windows{} for Windows, and \c{darwin-x86_64} for macOS. \note This variable is detected automatically. Normally, you don't have to change it. \row \li ANDROID_BUILD_TOOLS_REVISION \li Specifies the version of the SDK build tools used as part of the deployment process. For example, 28.0&#x2e;3&#x2e; \note Currently in the \c{build.gradle} script file, a known working value is hardcoded; so you don't have to change it. \endtable</code></div>
+<!-- @@@android-platform-notes.html -->
+<p class="naviNextPrevious footerNavi">
+</p>
+        </div>
+       </div>
+   </div>
+   </div>
+</div>
+<div class="footer">
+   <p>
+   <acronym title="Copyright">&copy;</acronym> 2020 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.<br/>    The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.<br/>    Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</body>
+</html>
